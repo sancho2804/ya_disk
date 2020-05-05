@@ -1,0 +1,19 @@
+{
+    "name": "sancho2804/yandex_disk",
+    "description": "Yandex Disk Sync",
+    "type": "library",
+    "require": {
+        "php": "^7.0",
+        "sancho2804/rest_client": "^1.0.3"
+    },
+    "license": "Apache-2.0",
+    "authors": [
+        {
+            "name": "sancho2804",
+            "email": "sancho2804@mail.ru"
+        }
+    ],
+    "autoload": {
+        "classmap": []
+    }
+}
