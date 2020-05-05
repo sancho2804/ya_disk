@@ -7,19 +7,23 @@ class init{
 	private $rest=null;
 	private $default_space_unit='gb';
 	private $default_path='/!yd_sync.json';
-	private $path=null;
+	private $scan_path=null;
+	private $start_path=null;
 	private $skip_dirs=[];
 	private $skip_files=[];
 	private $skip_files_by_name=[];
 	private $files=[];
+	private $need_update=[];
 	private $error='';
 
-	public function __construct($token,$path='/'){
-		if (!$token) throw new Error("Не указан токен");
-		if (!$path) throw new Error("Не верно указан путь для сканирования");
-		$this->path=$path;
+	public function __construct($token,$scan_path='/'){
+		if (!$token) throw new \Error("Не указан токен");
+		if (!$scan_path) throw new \Error("Не верно указан путь до сканируемой папки");
+		$this->scan_path=$scan_path;
+		$this->start_path=pathinfo(__FILE__,PATHINFO_DIRNAME);
 		$this->init_rest($token);
 		$this->read_complete_array();
+		chdir($this->start_path);
 	}
 
 	public function __get($var){
@@ -113,8 +117,39 @@ class init{
 		return true;
 	}
 
-	public function scan_dir():void{
+	public function scan($scan_path=null){
+		if (!$scan_path) $scan_path=$this->scan_path;
+		if (in_array($scan_path,$this->skip_dirs)) return;
 
+		$test=$this->start_path.$scan_path;
+		$files=scandir($this->start_path.$scan_path);
+		for ($i=2; $i < count($files); $i++) { 
+			$item=$this->start_path.$scan_path.$files[$i];
+			if (is_file($item)){
+				if (in_array($scan_path.$files[$i],$this->skip_files)) continue;
+				if (in_array($files[$i],$this->skip_files_by_name)) continue;
+
+				$last_modify=(int)filemtime($item);
+				$md5_file=md5_file($item);
+				if (!$this->files[$item]){
+					$this->files[$item]=[
+						'lastmod'=>$last_modify,
+						'md5'=>$md5_file
+					];
+					$this->need_update[$item]=$this->files[$item];
+				}else{
+					if ($this->files[$item]['lastmod']<=$last_modify || $this->files[$item]['md5']!=$md5_file){
+						$this->need_update[$item]=[
+							'lastmod'=>$last_modify,
+							'md5'=>$md5_file
+						];
+					}
+				}
+			}else{
+				$this->scan($scan_path.$files[$i].'/');
+			}
+		}
+		return $this->need_update;
 	}
 
 	public function sync(){
