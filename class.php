@@ -41,7 +41,7 @@ class init{
 
 	private function init_rest($token){
 		$this->rest=new rest_client\init('https://cloud-api.yandex.net:443/v1/','OAuth',$token);
-		$this->rest->eat_json('vendor/sancho2804/rest_client/json/yandex_disk.json');
+		$this->rest->eat_json('../rest_client/json/yandex_disk.json');
 	}
 
 	public function get_space(string $unit='mb'):array{
