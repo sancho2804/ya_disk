@@ -62,11 +62,6 @@ class init{
 		];
 	}
 
-	public function set_path($path){
-		if (!$path) throw new \Error("Не верно указан путь для сканирования");
-		$this->path=$path;
-	}
-
 	public function add_skip_dirs(array $dirs):bool{
 		if (!$dirs) return false;
 		$count=count($this->skip_dirs);
@@ -105,7 +100,7 @@ class init{
 		return false;
 	}
 
-	public function read_complete_array(string $path=null):bool{
+	private function read_complete_array(string $path=null):bool{
 		if (!$path) $path=__DIR__.$this->default_path;
 		if (!file_exists($path)){
 			$this->error='Файл с массивом найденных файлов не существует';
@@ -125,7 +120,7 @@ class init{
 		return true;
 	}
 
-	public function save_complete_array(string $path=null):bool{
+	private function save_complete_array(string $path=null):bool{
 		if (!$path) $path=__DIR__.$this->default_path;
 		$data=json_encode($this->files);
 		if (json_last_error()!=JSON_ERROR_NONE){
