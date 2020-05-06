@@ -44,7 +44,7 @@ class init{
 		$this->rest->eat_json('vendor/sancho2804/rest_client/json/yandex_disk.json');
 	}
 
-	public function get_space($unit='mb'):array{
+	public function get_space(string $unit='mb'):array{
 		$allow_units=[
 			'b'=>1,
 			'kb'=>1024,
@@ -134,9 +134,9 @@ class init{
 		return true;
 	}
 
-	public function scan($path=null){
+	private function scan(string $path=null){
 		if (!$path) $path='';
-		if (in_array($path,$this->skip_dirs)) return;
+		if (in_array($path,$this->skip_dirs)) return false;
 
 		$files=scandir($this->start_path.$path);
 		for ($i=0; $i < count($files); $i++) { 
@@ -163,7 +163,7 @@ class init{
 		return $this->need_update;
 	}
 
-	private function is_exist_path($path):bool{
+	private function is_exist_path(string $path):bool{
 		if (!$path) throw new \Error('Передан пустой путь');
 		if ($this->exists_paths[$path]) return true;
 		$this->rest->exec('dir_info',null,true,$path);
@@ -172,7 +172,7 @@ class init{
 		return true;
 	}
 
-	private function mk_dir_tree($path):bool{
+	private function mk_dir_tree(string $path):bool{
 		if (!$path) throw new \Error('Передан пустой путь');
 		if ($this->is_exist_path($path)) return true;
 		$parts=explode('/',$path);
@@ -193,13 +193,13 @@ class init{
 		return true;
 	}
 
-	private function get_upload_link($relative_path){
+	private function get_upload_link(string $relative_path){
 		$link=$this->rest->exec('get_upload',null,true,$relative_path);
 		if ($this->rest->last_request_info['http_code']!=200) return false;
 		return $link['href'];
 	}
 
-	private function upload_file($full_path, $relative_path):bool{
+	private function upload_file(string $full_path, string $relative_path):bool{
 		if (!file_exists($full_path)) return false;
 		$link=$this->get_upload_link($relative_path);
 		if (!$link){
@@ -222,7 +222,7 @@ class init{
 		if ($http_code == 201) return true;
 	}
 
-	public function sync($path=null,$start_path_on_disk='/'){
+	public function sync(string $path=null, string $start_path_on_disk='/'){
 		$start_path_on_disk=rtrim($start_path_on_disk,'/').'/';
 		$this->scan($path);
 		if (count($this->need_update)==0) return true;
