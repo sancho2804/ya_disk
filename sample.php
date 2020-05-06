@@ -3,12 +3,24 @@ require_once 'class.php';
 require_once 'token.php';
 use sancho2804\yandex_disk;
 
-$yd=new yandex_disk\init($token);
+//Создаем объект класса. Первый аргумент - токен для подключения к янднес диску. 
+//Второй задает директорию откуда начинать сканирование (по умолчанию = папка запуска скрипта).
+$yd=new yandex_disk\init($token,__DIR__);
+$yd->start_path='/files/www/rest_client';//Таким образом мы можем менять начальную директория сканирования.
 
-$result=$yd->get_space('gb');
-$yd->add_skip_dirs(['/.git/','/.vscode/','/vendor/']);
-$yd->add_skip_files(['/.gitignore']);
-$yd->add_skip_files_by_name(['composer.lock']);
+//Получение информации о месте на диске.
+$result=$yd->get_space('gb'); 
 var_dump($result);
-var_dump($yd->scan());
-// var_dump($yd->get_dir_info()['_embedded']['items']);
+echo '<hr>';
+
+//Добавление папок, которые стоит пропускать. 
+$yd->add_skip_dirs(['.vscode','vendor']);//Принимает массив из относительных путей от начальной директории сканирования. В примере будут пропускаться папки /files/www/rest_client/.vscode и /files/www/rest_client/vendor
+$yd->add_skip_dirs_by_name(['.git']);//Пропуск производится по сравниванию имен папок. В данном примере папка .git будет пропущена во всех папках и подпапках.
+
+//Добавление файлов, которые стоит пропускать. 
+$yd->add_skip_files(['.gitignore']);//Принимает массив из относительных путей до файла от начальной директории сканирования. В примере пропустится файл /files/www/rest_client/.gitignore
+$yd->add_skip_files_by_name(['.ds_store']);//Пропуск производится по сравниванию имен файлов. В данном примере файл .ds_store будет пропущен во всех папках и подпапках.
+
+//Запуск синхронизации с яндекс диском.
+$result=$yd->sync(null,'/test');//Первый аргумент - относительный путь от начальную директория сканирования. Второй - путь на яндекс диске куда закачивать файлы.
+var_dump($result);
