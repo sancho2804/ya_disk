@@ -1,17 +1,18 @@
 <?php
-require_once 'class.php';
-require_once 'token.php';
-use sancho2804\yandex_disk;
+include 'vendor/autoload.php';
+include 'token.php';
+use sancho2804\yandex_disk\main as yandex_disk;
 
 //Создаем объект класса. Первый аргумент - токен для подключения к янднес диску. 
 //Второй задает директорию откуда начинать сканирование (по умолчанию = папка запуска скрипта).
-$yd=new yandex_disk\init($token,__DIR__);
+$yd=new yandex_disk($token,__DIR__);
 $yd->start_path='/files/www/yandex_disk';//Таким образом мы можем менять начальную директория сканирования.
 
 //Получение информации о месте на диске.
 $result=$yd->get_space('gb'); 
 var_dump($result);
 echo '<hr>';
+exit;
 
 //Добавление папок, которые стоит пропускать. 
 $yd->add_skip_dirs(['.vscode','vendor']);//Принимает массив из относительных путей от начальной директории сканирования. В примере будут пропущены папки /files/www/rest_client/.vscode и /files/www/rest_client/vendor
